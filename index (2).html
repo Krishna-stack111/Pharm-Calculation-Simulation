@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PharmCalc | Pharmaceutical Concentration Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] }, startup: { typeset: false } };
+</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js"></script>
+<style>
+:root{--bg:#F8FAFC;--panel:#fff;--ink:#0F172A;--muted:#64748B;--line:#E2E8F0;--accent:#0284C7;--soft:#E0F2FE;--warn:#B91C1C}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+header{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.in{max-width:1000px;margin:0 auto;padding:0 16px}
+.top{padding-top:16px}
+h1{font-size:1.6rem;margin:0;letter-spacing:-.01em}
+.sub{margin:0 0 10px;color:var(--muted);font-size:.9rem}
+.tabs{display:flex;gap:22px;overflow-x:auto;white-space:nowrap}
+.tabs button{font:inherit;background:none;border:0;border-bottom:2px solid transparent;padding:6px 2px 10px;color:var(--muted);cursor:pointer}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 48px}
+.guide{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin-bottom:24px}
+.guide h2{font-size:1.1rem;margin:0 0 10px}
+.guide .g{display:grid;grid-template-columns:1fr 1fr;gap:20px;color:var(--muted);font-size:.9rem}
+@media(max-width:720px){.guide .g{grid-template-columns:1fr}}
+.guide h3{font-size:.95rem;color:var(--ink);margin:0 0 4px}
+.guide ul{margin:0;padding-left:18px}
+.tip{margin-top:14px;background:var(--soft);color:#075985;border-radius:8px;padding:10px 12px;font-size:.88rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.card h2{font-size:1.15rem;margin:0}
+.desc{color:var(--muted);font-size:.9rem;margin:2px 0 14px}
+.cols{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:24px}
+@media(max-width:720px){.cols{grid-template-columns:1fr}}
+label{display:block;font-size:.85rem;font-weight:500;color:#475569;margin:10px 0 4px}
+.field{display:flex;gap:8px;align-items:center}
+input{font:inherit;width:100%;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;color:var(--ink)}
+input:focus{border-color:var(--accent)}
+.unit{color:var(--muted);min-width:54px;font-size:.82rem}
+.ex{font:inherit;font-size:.85rem;margin-top:14px;padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.box{background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border-radius:10px;padding:14px 16px}
+.res{padding:8px 0;border-bottom:1px solid rgba(2,132,199,.15)}
+.res:last-child{border-bottom:0}
+.lbl{color:var(--muted);font-size:.85rem}
+.val{font-size:1.9rem;font-weight:700;color:var(--accent);line-height:1.2}
+.val small{font-size:.88rem;font-weight:400;color:var(--muted);margin-left:6px}
+code{display:block;margin-top:4px;font-family:"Spline Sans Mono",ui-monospace,monospace;font-size:.78rem;background:rgba(255,255,255,.7);padding:5px 8px;border-radius:6px;overflow-x:auto}
+.fm{margin-top:12px;font-size:.85rem;color:var(--muted)}
+.fm .eq{overflow-x:auto;color:var(--ink)}
+.empty{color:var(--muted);font-size:.92rem}
+.msg{color:var(--warn);padding:6px 0}
+footer{max-width:1000px;margin:0 auto;padding:0 16px 32px;color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="in top">
+    <h1>PharmCalc</h1>
+    <p class="sub">Pharmaceutical Concentration Simulator</p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+  </div>
+</header>
+
+<main>
+  <section class="guide">
+    <h2>How to use this simulator</h2>
+    <div class="g">
+      <div>
+        <h3>1. Standard calculations</h3>
+        <ul>
+          <li>Pick a unit from the tabs above: molarity, normality, molality or a percentage.</li>
+          <li>Type your known values. Results update as you type.</li>
+          <li>Read the working line under each result to see your numbers in the formula.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>2. Conversions and dilution</h3>
+        <ul>
+          <li>Open Conversions to move between molarity, molality and % w/w.</li>
+          <li>Enter the solution density (g/mL). It links volume-based units to mass-based ones.</li>
+          <li>Open Dilution to find how much concentrated stock to measure for a target solution.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tip">Check units first: molecular weight in g/mol, mass in grams, volume in mL. The app converts to litres where a formula needs it.</div>
+  </section>
+  <div id="cards"></div>
+</main>
+<footer>For educational use only. Verify critical formulation calculations independently before use in practice.</footer>
+
+<script>
+const f = x => {
+  if (!isFinite(x)) return '–';
+  const a = Math.abs(x);
+  if (a !== 0 && (a >= 1e6 || a < 1e-3)) return x.toExponential(3);
+  return String(+x.toPrecision(4));
+};
+const ok = x => isFinite(x) && x >= 0;
+const O = (label, val, unit, work) => ok(val) ? {label, val, unit, work} : null;
+const E = msg => ({err: msg});
+const L = String.raw;
+
+const TABS = {
+  'Molarity (M)': [{
+    title: 'Molarity (M)',
+    desc: 'Moles of solute in one litre of solution. It shifts with temperature because the volume does.',
+    formula: L`$$M=\frac{\text{mass (g)}/\text{MW (g/mol)}}{V\ (\text{L})}$$`,
+    inputs: [['mass','Mass of solute','g'], ['mw','Molecular weight','g/mol'], ['vol','Volume of solution','mL']],
+    ex: {mass:58.44, mw:58.44, vol:1000},
+    calc: v => [O('Molarity', v.mass/v.mw/(v.vol/1000), 'mol/L', `M = (${f(v.mass)} ÷ ${f(v.mw)}) ÷ ${f(v.vol/1000)} L`)]
+  }],
+  'Normality (N)': [{
+    title: 'Normality (N)',
+    desc: 'Equivalents of solute in one litre of solution. Common in pharmacopoeial titrations.',
+    formula: L`$$N=\frac{\text{mass}/(\text{MW}/n)}{V\ (\text{L})}$$`,
+    inputs: [['mass','Mass of solute','g'], ['mw','Molecular weight','g/mol'], ['vol','Volume of solution','mL'], ['nf','n-factor','eq/mol']],
+    ex: {mass:4.9, mw:98.08, vol:1000, nf:2},
+    calc: v => {
+      const ew = v.mw/v.nf;
+      return [
+        O('Equivalent weight', ew, 'g/eq', `EW = MW ÷ n = ${f(v.mw)} ÷ ${f(v.nf)}`),
+        O('Normality', v.mass/ew/(v.vol/1000), 'eq/L', `N = (${f(v.mass)} ÷ ${f(ew)}) ÷ ${f(v.vol/1000)} L`)
+      ];
+    }
+  }],
+  'Molality (m)': [{
+    title: 'Molality (m)',
+    desc: 'Moles of solute per kilogram of solvent. It does not change with temperature.',
+    formula: L`$$m=\frac{\text{mass (g)}/\text{MW (g/mol)}}{\text{mass of solvent (kg)}}$$`,
+    inputs: [['mass','Mass of solute','g'], ['mw','Molecular weight','g/mol'], ['solv','Mass of solvent (not the solution)','kg']],
+    ex: {mass:58.44, mw:58.44, solv:1},
+    calc: v => [O('Molality', v.mass/v.mw/v.solv, 'mol/kg', `m = (${f(v.mass)} ÷ ${f(v.mw)}) ÷ ${f(v.solv)} kg`)]
+  }],
+  'Percentages (%)': [
+    {
+      title: '% w/v',
+      desc: 'Grams of solute per 100 mL of solution. Typical for syrups and infusion bags.',
+      formula: L`$$\%\,\text{w/v}=\frac{\text{solute (g)}}{\text{solution (mL)}}\times100$$`,
+      inputs: [['sm','Solute mass','g'], ['vol','Solution volume','mL']],
+      ex: {sm:5, vol:100},
+      calc: v => [O('Weight in volume', v.sm/v.vol*100, '% w/v', `${f(v.sm)} ÷ ${f(v.vol)} × 100`)]
+    },
+    {
+      title: '% w/w',
+      desc: 'Grams of solute per 100 g of the finished product. Typical for ointments and creams.',
+      formula: L`$$\%\,\text{w/w}=\frac{\text{solute (g)}}{\text{total (g)}}\times100$$`,
+      inputs: [['sm','Solute mass','g'], ['tm','Total mass','g']],
+      ex: {sm:2, tm:50},
+      calc: v => [O('Weight in weight', v.sm/v.tm*100, '% w/w', `${f(v.sm)} ÷ ${f(v.tm)} × 100`)]
+    },
+    {
+      title: '% v/v',
+      desc: 'Millilitres of solute per 100 mL of the finished liquid. Typical for liquid extracts.',
+      formula: L`$$\%\,\text{v/v}=\frac{\text{solute (mL)}}{\text{total (mL)}}\times100$$`,
+      inputs: [['sv','Solute volume','mL'], ['tv','Total volume','mL']],
+      ex: {sv:20, tv:100},
+      calc: v => [O('Volume in volume', v.sv/v.tv*100, '% v/v', `${f(v.sv)} ÷ ${f(v.tv)} × 100`)]
+    }
+  ],
+  'Conversions': [
+    {
+      title: 'From molarity to molality and % w/w',
+      desc: 'Solution density links a volume-based unit (M) to mass-based units (m and % w/w).',
+      formula: L`$$m=\frac{1000M}{1000\rho-M\cdot MW}\qquad \%\,\text{w/w}=\frac{M\cdot MW}{10\rho}$$`,
+      inputs: [['M','Molarity','mol/L'], ['mw','Molecular weight','g/mol'], ['rho','Solution density','g/mL']],
+      ex: {M:1, mw:58.44, rho:1.04},
+      calc: v => {
+        const d = 1000*v.rho - v.M*v.mw;
+        if (isFinite(d) && d <= 0) return [E('Not possible: the solute alone would outweigh the solution. Check the density and molarity.')];
+        return [
+          O('Molality', 1000*v.M/d, 'mol/kg', `m = 1000 × ${f(v.M)} ÷ (${f(1000*v.rho)} − ${f(v.M*v.mw)})`),
+          O('Weight in weight', v.M*v.mw/(10*v.rho), '% w/w', `% w/w = ${f(v.M)} × ${f(v.mw)} ÷ (10 × ${f(v.rho)})`)
+        ];
+      }
+    },
+    {
+      title: 'From molality to molarity and % w/w',
+      desc: 'The reverse route, starting from moles per kilogram of solvent.',
+      formula: L`$$M=\frac{1000\,m\,\rho}{1000+m\cdot MW}\qquad \%\,\text{w/w}=\frac{m\cdot MW}{1000+m\cdot MW}\times100$$`,
+      inputs: [['m','Molality','mol/kg'], ['mw','Molecular weight','g/mol'], ['rho','Solution density','g/mL']],
+      ex: {m:1, mw:58.44, rho:1.04},
+      calc: v => {
+        const d = 1000 + v.m*v.mw;
+        return [
+          O('Molarity', 1000*v.m*v.rho/d, 'mol/L', `M = 1000 × ${f(v.m)} × ${f(v.rho)} ÷ (1000 + ${f(v.m*v.mw)})`),
+          O('Weight in weight', v.m*v.mw/d*100, '% w/w', `% w/w = ${f(v.m*v.mw)} ÷ ${f(d)} × 100`)
+        ];
+      }
+    }
+  ],
+  'Dilution': [{
+    title: 'Stock strength and dilution',
+    desc: 'Find the molarity of a concentrated stock sold as % w/w, then how much to measure for a target solution.',
+    formula: L`$$M_1=\frac{\%\,\text{w/w}\times\rho\times10}{MW}\qquad V_1=\frac{M_2V_2}{M_1}$$`,
+    inputs: [['pct','Stock strength','% w/w'], ['rho','Stock density','g/mL'], ['mw','Molecular weight','g/mol'],
+             ['tm','Target molarity','mol/L'], ['fv','Final volume','mL']],
+    ex: {pct:37, rho:1.18, mw:36.46, tm:0.1, fv:500},
+    calc: v => {
+      const M = v.pct*v.rho*10/v.mw, vs = v.tm*v.fv/M;
+      return [
+        O('Stock molarity', M, 'mol/L', `M₁ = ${f(v.pct)} × ${f(v.rho)} × 10 ÷ ${f(v.mw)}`),
+        O('Stock volume to measure', vs, 'mL', `V₁ = ${f(v.tm)} × ${f(v.fv)} ÷ ${f(M)}`),
+        O('Stock mass to weigh', vs*v.rho, 'g', `mass = V₁ × ρ = ${f(vs)} × ${f(v.rho)}`),
+        O('Diluent to make up to volume', v.fv - vs, 'mL', `${f(v.fv)} − ${f(vs)}`)
+      ];
+    }
+  }]
+};
+
+const tabsEl = document.getElementById('tabs'), cardsEl = document.getElementById('cards');
+let cur = Object.keys(TABS)[0];
+
+function typeset(){
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([cardsEl]);
+}
+
+function showTab(){
+  tabsEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.dataset.k === cur));
+  cardsEl.innerHTML = '';
+  TABS[cur].forEach((c, i) => {
+    const el = document.createElement('section');
+    el.className = 'card';
+    el.innerHTML = `
+      <h2>${c.title}</h2><p class="desc">${c.desc}</p>
+      <div class="cols">
+        <div>
+          ${c.inputs.map(([id,lab,unit]) => `
+            <label for="c${i}_${id}">${lab}</label>
+            <div class="field"><input id="c${i}_${id}" type="number" step="any" min="0" inputmode="decimal"><span class="unit">${unit}</span></div>`).join('')}
+          <button type="button" class="ex">Load example</button>
+        </div>
+        <div>
+          <div class="box" aria-live="polite"><div class="out"></div></div>
+          <div class="fm">The maths<div class="eq">${c.formula}</div></div>
+        </div>
+      </div>`;
+    cardsEl.appendChild(el);
+    const out = el.querySelector('.out');
+    const run = () => {
+      const v = {};
+      c.inputs.forEach(([id]) => {
+        const s = document.getElementById(`c${i}_${id}`).value.trim();
+        v[id] = s === '' ? NaN : parseFloat(s);
+      });
+      const rows = c.calc(v).filter(Boolean);
+      out.innerHTML = rows.length ? rows.map(r => r.err
+        ? `<div class="msg">${r.err}</div>`
+        : `<div class="res"><div class="lbl">${r.label}</div><div class="val">${f(r.val)}<small>${r.unit}</small></div><code>${r.work}</code></div>`).join('')
+        : '<div class="empty">Enter the values on the left to see the result and working.</div>';
+    };
+    el.querySelectorAll('input').forEach(inp => inp.addEventListener('input', run));
+    el.querySelector('.ex').onclick = () => {
+      Object.entries(c.ex).forEach(([id,val]) => { document.getElementById(`c${i}_${id}`).value = val; });
+      run();
+    };
+    run();
+  });
+  typeset();
+}
+
+Object.keys(TABS).forEach(k => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.dataset.k = k; b.textContent = k; b.setAttribute('role','tab');
+  b.onclick = () => { cur = k; showTab(); };
+  tabsEl.appendChild(b);
+});
+showTab();
+window.addEventListener('load', typeset);
+</script>
+</body>
+</html>
