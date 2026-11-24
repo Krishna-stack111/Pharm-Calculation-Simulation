@@ -10,13 +10,4 @@ An interactive web app for pharmacy students, educators and formulation scientis
 - **Mass, volume and density** solver
 - Real-time results, works on mobile, light and dark mode
 
-## Run it
-Open `index.html` in a browser. No install or build step is needed.
 
-## Host it free
-1. Push this folder to a GitHub repository.
-2. Go to **Settings > Pages**, choose the `main` branch and the root folder, then save.
-3. Your live app appears at `https://<your-username>.github.io/<repo-name>/`.
-
-## Note
-Educational tool. Verify critical formulation calculations independently before use in practice.
